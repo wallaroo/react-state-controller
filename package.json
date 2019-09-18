@@ -1,0 +1,25 @@
+{
+  "name": "react-state-controller",
+  "version": "1.0.0",
+  "description": "An utility Class to easily manage shared state",
+  "main": "index.js",
+  "repository": "https://github.com/wallaroo/react-state-controller.git",
+  "author": "wallaroo",
+  "license": "MIT",
+  "private": false,
+  "peerDependencies": {
+    "react": "^16.9.0"
+  },
+  "devDependencies": {
+    "react": "^16.9.0",
+    "typescript": "^3.6.3"
+  },
+  "dependencies": {
+    "@types/nanoevents": "^1.0.0",
+    "auto-bind": "^2.1.0",
+    "nanoevents": "^2.0.0"
+  },
+  "scripts": {
+    "build":"tsc"
+  }
+}
