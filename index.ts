@@ -13,7 +13,7 @@ function isFun<K>(x: any): x is fun<K> {
 export interface IController<S extends { [k: string]: any }> {
     use<K extends keyof S>(target: K): S[K];
 }
-class Controller<S extends { [k: string]: any }, K extends keyof S> implements IController<S>{
+class Controller<S extends { [k: string]: any }, K extends keyof S = keyof S> implements IController<S>{
     protected emitter: NanoEvents.Emitter<any>;
 
     protected state: S;
