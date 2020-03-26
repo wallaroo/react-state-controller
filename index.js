@@ -4,17 +4,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const auto_bind_1 = __importDefault(require("auto-bind"));
-const nanoevents_1 = __importDefault(require("nanoevents"));
+const nanoevents_1 = require("nanoevents");
 const react_1 = require("react");
+function isFun(x) {
+    if (typeof x === "function") {
+        return true;
+    }
+    return false;
+}
 class Controller {
     constructor(initialState) {
         auto_bind_1.default(this);
-        this.emitter = new nanoevents_1.default();
+        this.emitter = nanoevents_1.createNanoEvents();
         this.state = (initialState || {});
     }
     setState(target, value) {
-        this.state[target] = value;
-        this.emitter.emit(target, value);
+        setTimeout(() => {
+            if (isFun(value)) {
+                this.state[target] = value(this.state[target]);
+            }
+            else {
+                this.state[target] = value;
+            }
+            this.emitter.emit(target, this.state[target]);
+        });
     }
     use(target) {
         const [state, setState] = react_1.useState(this.state[target]);

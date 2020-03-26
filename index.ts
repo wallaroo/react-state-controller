@@ -1,32 +1,49 @@
 import autoBind from "auto-bind";
-import NanoEvents from "nanoevents";
+import NanoEvents, { Emitter, createNanoEvents } from "nanoevents";
 import { useEffect, useState } from "react";
 
-class Controller<S extends object> {
-   emitter: NanoEvents<S>;
+type fun<K> = (s: K) => K;
 
-   state: S;
+function isFun<K>(x: any): x is fun<K> {
+    if (typeof x === "function") {
+        return true;
+    }
+    return false;
+}
+export interface IController<S extends { [k: string]: any }> {
+    use<K extends keyof S>(target: K): S[K];
+}
+class Controller<S extends { [k: string]: any }, K extends keyof S> implements IController<S>{
+    protected emitter: NanoEvents.Emitter<any>;
 
-   constructor(initialState?: Partial<S>) {
-       autoBind(this as any);
-       this.emitter = new NanoEvents();
-       this.state = (initialState || {}) as S;
-   }
+    protected state: S;
 
-   protected setState<K extends keyof S>(target: K, value: S[K]) {
-       this.state[target] = value;
-       this.emitter.emit(target, value);
-   }
+    constructor(initialState?: Partial<S>) {
+        autoBind(this as any);
+        this.emitter = createNanoEvents();
+        this.state = (initialState || {}) as S;
+    }
+    protected setState(target: K, value: S[K] | fun<S[K]>) {
+        // defer // TODO multiple setState should produce a single emit
+        setTimeout(() => {
+            if (isFun<S[K]>(value)) {
+                this.state[target] = value(this.state[target]);
+            } else {
+                this.state[target] = value;
+            }
+            this.emitter.emit(target, this.state[target]);
+        })
+    }
 
-   public use<K extends keyof S>(target: K): S[K] {
-       const [state, setState] = useState(this.state[target]);
-       useEffect(() => {
-           const unsubscribe = this.emitter.on(target, (value) => {
-               setState(value);
-           })
-           return unsubscribe;
-       }, [target]);
-       return state;
-   }
+    public use<K extends keyof S>(target: K): S[K] {
+        const [state, setState] = useState(this.state[target]);
+        useEffect(() => {
+            const unsubscribe = this.emitter.on(target, (value: any) => {
+                setState(value);
+            })
+            return unsubscribe;
+        }, [target]);
+        return state;
+    }
 }
 export default Controller;
