@@ -23,15 +23,18 @@ class Controller<S extends { [k: string]: any }, K extends keyof S = keyof S> im
         this.emitter = createNanoEvents();
         this.state = (initialState || {}) as S;
     }
-    protected setState(target: K, value: S[K] | fun<S[K]>) {
-        // defer // TODO multiple setState should produce a single emit
-        setTimeout(() => {
-            if (isFun<S[K]>(value)) {
-                this.state[target] = value(this.state[target]);
-            } else {
-                this.state[target] = value;
-            }
-            this.emitter.emit(target, this.state[target]);
+    protected setState(target: K, value: S[K] | fun<S[K]>): Promise<void> {
+        return new Promise((resolve) => {
+            // defer // TODO multiple setState should produce a single emit
+            setTimeout(() => {
+                if (isFun<S[K]>(value)) {
+                    this.state[target] = value(this.state[target]);
+                } else {
+                    this.state[target] = value;
+                }
+                this.emitter.emit(target, this.state[target]);
+                resolve();
+            })
         })
     }
 
