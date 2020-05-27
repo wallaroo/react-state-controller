@@ -12,6 +12,12 @@ function isFun(x) {
     }
     return false;
 }
+function isString(x) {
+    return typeof x === "string";
+}
+function isObject(x) {
+    return typeof x === "object";
+}
 class Controller {
     constructor(initialState) {
         auto_bind_1.default(this);
@@ -19,15 +25,26 @@ class Controller {
         this.state = (initialState || {});
     }
     setState(target, value) {
-        setTimeout(() => {
-            if (isFun(value)) {
-                this.state[target] = value(this.state[target]);
-            }
-            else {
-                this.state[target] = value;
-            }
-            this.emitter.emit(target, this.state[target]);
-        });
+        if (isString(target)) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    if (isFun(value)) {
+                        this.state[target] = value(this.state[target]);
+                    }
+                    else if (value) {
+                        this.state[target] = value;
+                    }
+                    this.emitter.emit(target, this.state[target]);
+                    resolve();
+                });
+            });
+        }
+        else if (isObject(target)) {
+            return Promise.all(Object.keys(target).map((a) => { this.setState(a, target[a]); }));
+        }
+        else {
+            throw new Error("Wrong parameters");
+        }
     }
     use(target) {
         const [state, setState] = react_1.useState(this.state[target]);

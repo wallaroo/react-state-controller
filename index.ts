@@ -10,6 +10,15 @@ function isFun<K>(x: any): x is fun<K> {
     }
     return false;
 }
+
+function isString<K>(x: any): x is K {
+    return typeof x === "string";
+}
+
+function isObject<K>(x: any): x is K {
+    return typeof x === "object";
+}
+
 export interface IController<S extends { [k: string]: any }> {
     use<K extends keyof S>(target: K): S[K];
 }
@@ -23,19 +32,30 @@ class Controller<S extends { [k: string]: any }, K extends keyof S = keyof S> im
         this.emitter = createNanoEvents();
         this.state = (initialState || {}) as S;
     }
-    protected setState(target: K, value: S[K] | fun<S[K]>): Promise<void> {
-        return new Promise((resolve) => {
-            // defer // TODO multiple setState should produce a single emit
-            setTimeout(() => {
-                if (isFun<S[K]>(value)) {
-                    this.state[target] = value(this.state[target]);
-                } else {
-                    this.state[target] = value;
-                }
-                this.emitter.emit(target, this.state[target]);
-                resolve();
+
+    protected setState(obj: { [target in K]: S[K] }): Promise<void[]>
+    protected setState(target: K, value: S[K]): Promise<void>
+    protected setState(
+        target: K | { [target in K]: S[K] },
+        value?: S[K] | fun<S[K]>): Promise<void | void[]> {
+        if (isString<K>(target)) {
+            return new Promise((resolve) => {
+                // defer
+                setTimeout(() => {
+                    if (isFun<S[K]>(value)) {
+                        this.state[target] = value(this.state[target]);
+                    } else if (value) {
+                        this.state[target] = value;
+                    }
+                    this.emitter.emit(target, this.state[target]);
+                    resolve();
+                })
             })
-        })
+        } else if (isObject<{ [target in K]: S[K] }>(target)) {
+            return Promise.all((Object.keys(target) as K[]).map((a: K) => { this.setState(a, target[a]) }))
+        } else {
+            throw new Error("Wrong parameters")
+        }
     }
 
     public use<K extends keyof S>(target: K): S[K] {
