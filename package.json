@@ -1,6 +1,6 @@
 {
   "name": "react-state-controller",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "An utility Class to easily manage shared state",
   "main": "index.js",
   "repository": "https://github.com/wallaroo/react-state-controller.git",
