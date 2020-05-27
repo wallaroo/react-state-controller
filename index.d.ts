@@ -10,9 +10,7 @@ declare class Controller<S extends {
     protected emitter: NanoEvents.Emitter<any>;
     protected state: S;
     constructor(initialState?: Partial<S>);
-    protected setState(obj: {
-        [target in K]: S[K];
-    }): Promise<void[]>;
+    protected setState(obj: Partial<S>): Promise<void[]>;
     protected setState(target: K, value: S[K]): Promise<void>;
     use<K extends keyof S>(target: K): S[K];
 }

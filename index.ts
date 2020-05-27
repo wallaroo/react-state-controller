@@ -33,10 +33,10 @@ class Controller<S extends { [k: string]: any }, K extends keyof S = keyof S> im
         this.state = (initialState || {}) as S;
     }
 
-    protected setState(obj: { [target in K]: S[K] }): Promise<void[]>
+    protected setState(obj: Partial<S>): Promise<void[]>
     protected setState(target: K, value: S[K]): Promise<void>
     protected setState(
-        target: K | { [target in K]: S[K] },
+        target: K | Partial<S>,
         value?: S[K] | fun<S[K]>): Promise<void | void[]> {
         if (isString<K>(target)) {
             return new Promise((resolve) => {
@@ -51,7 +51,7 @@ class Controller<S extends { [k: string]: any }, K extends keyof S = keyof S> im
                     resolve();
                 })
             })
-        } else if (isObject<{ [target in K]: S[K] }>(target)) {
+        } else if (isObject<S>(target)) {
             return Promise.all((Object.keys(target) as K[]).map((a: K) => { this.setState(a, target[a]) }))
         } else {
             throw new Error("Wrong parameters")
