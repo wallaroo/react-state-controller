@@ -44,7 +44,7 @@ class Controller<S extends { [k: string]: any }, K extends keyof S = keyof S> im
                 setTimeout(() => {
                     if (isFun<S[K]>(value)) {
                         this.state[target] = value(this.state[target]);
-                    } else if (value) {
+                    } else if (value !== undefined) {
                         this.state[target] = value;
                     }
                     this.emitter.emit(target, this.state[target]);
