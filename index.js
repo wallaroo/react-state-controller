@@ -31,7 +31,7 @@ class Controller {
                     if (isFun(value)) {
                         this.state[target] = value(this.state[target]);
                     }
-                    else if (value) {
+                    else if (value !== undefined) {
                         this.state[target] = value;
                     }
                     this.emitter.emit(target, this.state[target]);
