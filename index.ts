@@ -34,7 +34,7 @@ class Controller<S extends { [k: string]: any }, K extends keyof S = keyof S> im
     }
 
     protected setState(obj: Partial<S>): Promise<void[]>
-    protected setState(target: K, value: S[K]): Promise<void>
+    protected setState(target: K, value: S[K] | fun<S[K]>): Promise<void>
     protected setState(
         target: K | Partial<S>,
         value?: S[K] | fun<S[K]>): Promise<void | void[]> {

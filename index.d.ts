@@ -1,4 +1,5 @@
 import NanoEvents from "nanoevents";
+declare type fun<K> = (s: K) => K;
 export interface IController<S extends {
     [k: string]: any;
 }> {
@@ -11,7 +12,7 @@ declare class Controller<S extends {
     protected state: S;
     constructor(initialState?: Partial<S>);
     protected setState(obj: Partial<S>): Promise<void[]>;
-    protected setState(target: K, value: S[K]): Promise<void>;
+    protected setState(target: K, value: S[K] | fun<S[K]>): Promise<void>;
     use<K extends keyof S>(target: K): S[K];
 }
 export default Controller;
