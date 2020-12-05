@@ -53,7 +53,7 @@ class Controller {
                 setState(value);
             });
             return unsubscribe;
-        }, [target]);
+        }, [this, target]);
         return state;
     }
 }

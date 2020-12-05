@@ -69,7 +69,7 @@ class Controller<S extends { [k: string]: any }, K extends keyof S = keyof S> im
                 setState(value);
             })
             return unsubscribe;
-        }, [target]);
+        }, [this, target]);
         return state;
     }
 }
