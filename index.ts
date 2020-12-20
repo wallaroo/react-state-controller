@@ -44,16 +44,13 @@ class Controller<S extends { [k: string]: any }, K extends keyof S = keyof S> im
         value?: S[K] | fun<S[K]>): Promise<void | void[]> {
         if (isString<K>(target)) {
             return new Promise((resolve) => {
-                // defer
-                setTimeout(() => {
-                    if (isFun<S[K]>(value)) {
-                        this.state[target] = value(this.state[target]);
-                    } else if (value !== undefined) {
-                        this.state[target] = value;
-                    }
-                    this.emitter.emit(target, this.state[target]);
-                    resolve();
-                })
+                if (isFun<S[K]>(value)) {
+                    this.state[target] = value(this.state[target]);
+                } else if (value !== undefined) {
+                    this.state[target] = value;
+                }
+                this.emitter.emit(target, this.state[target]);
+                resolve();
             })
         } else if (isObject<S>(target)) {
             return Promise.all((Object.keys(target) as K[]).map((a: K) => { this.setState(a, target[a]) }))

@@ -27,16 +27,14 @@ class Controller {
     setState(target, value) {
         if (isString(target)) {
             return new Promise((resolve) => {
-                setTimeout(() => {
-                    if (isFun(value)) {
-                        this.state[target] = value(this.state[target]);
-                    }
-                    else if (value !== undefined) {
-                        this.state[target] = value;
-                    }
-                    this.emitter.emit(target, this.state[target]);
-                    resolve();
-                });
+                if (isFun(value)) {
+                    this.state[target] = value(this.state[target]);
+                }
+                else if (value !== undefined) {
+                    this.state[target] = value;
+                }
+                this.emitter.emit(target, this.state[target]);
+                resolve();
             });
         }
         else if (isObject(target)) {
